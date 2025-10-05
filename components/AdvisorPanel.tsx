@@ -32,7 +32,10 @@ export const AdvisorPanel: React.FC<AdvisorPanelProps> = ({ advice, onGetAdvice,
                         <span>Analyzing...</span>
                     </>
                 ) : (
-                    'Get New Suggestions'
+                    <>
+                        <LightBulbIcon className="w-5 h-5" />
+                        <span>Get New Suggestions</span>
+                    </>
                 )}
             </button>
 
