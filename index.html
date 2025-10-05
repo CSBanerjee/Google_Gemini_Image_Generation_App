@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VisionCraft AI - Smart Poster & Image Creator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script type="importmap">
+    {
+      "imports": {
+        "react/": "https://aistudiocdn.com/react@^19.2.0/",
+        "react": "https://aistudiocdn.com/react@^19.2.0",
+        "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+        "@google/genai": "https://aistudiocdn.com/@google/genai@^1.22.0"
+      }
+    }
+    </script>
+    <style>
+      :root { /* Default (Light) Theme */
+        --color-bg: #FFFFFF;
+        --color-surface: #F3F4F6;
+        --color-border: #D1D5DB;
+        --color-text-primary: #111827;
+        --color-text-secondary: #6B7280;
+        --color-brand-primary: #0070D2;
+        --color-brand-secondary: #FF457D;
+      }
+      [data-theme="dark"] {
+        --color-bg: #000000;
+        --color-surface: #111111;
+        --color-border: #2F2F2F;
+        --color-text-primary: #E5E7EB;
+        --color-text-secondary: #9CA3AF;
+        --color-brand-primary: #389BFF;
+        --color-brand-secondary: #FF6692;
+      }
+      [data-theme="mariana"] {
+        --color-bg: #1A1A2E;
+        --color-surface: #202035;
+        --color-border: #353550;
+        --color-text-primary: #E0E0FF;
+        --color-text-secondary: #A0A0C0;
+        --color-brand-primary: #00B3FF;
+        --color-brand-secondary: #FF00A5;
+      }
+      body {
+        background-color: var(--color-bg);
+        color: var(--color-text-primary);
+        font-family: 'Public Sans', sans-serif;
+      }
+    </style>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'bg': 'var(--color-bg)',
+              'surface': 'var(--color-surface)',
+              'border': 'var(--color-border)',
+              'text-primary': 'var(--color-text-primary)',
+              'text-secondary': 'var(--color-text-secondary)',
+              'brand-primary': 'var(--color-brand-primary)',
+              'brand-secondary': 'var(--color-brand-secondary)',
+            },
+            fontFamily: {
+              sans: ['Public Sans', 'sans-serif'],
+            },
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-bg text-text-primary font-sans antialiased">
+    <div id="root"></div>
+</body>
+</html>
