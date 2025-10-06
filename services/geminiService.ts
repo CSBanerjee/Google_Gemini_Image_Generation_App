@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Modality, Type, GenerateContentResponse } from "@google/genai";
 import { AppSettings, ProductImage } from '../types';
 
@@ -32,6 +31,43 @@ export const describeImage = async (base64Image: string, mimeType: string): Prom
     }
 };
 
+export const removeBackground = async (
+  productImage: ProductImage
+): Promise<string | null> => {
+  try {
+    const imagePart = {
+      inlineData: {
+        data: productImage.base64,
+        mimeType: productImage.file.type,
+      },
+    };
+
+    const textPart = {
+      text: "Isolate the main subject of the image and remove the background completely. The output must be a PNG with a transparent background.",
+    };
+
+    const response: GenerateContentResponse = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: {
+        parts: [imagePart, textPart]
+      },
+      config: {
+        responseModalities: [Modality.IMAGE, Modality.TEXT],
+      },
+    });
+
+    for (const part of response.candidates[0].content.parts) {
+      if (part.inlineData) {
+        return part.inlineData.data;
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error("Error removing background with Gemini API:", error);
+    throw new Error("Failed to remove background. Please try again.");
+  }
+};
+
 
 export const generatePoster = async (
   productImage: ProductImage,
@@ -62,7 +98,6 @@ export const generatePoster = async (
       },
       config: {
         responseModalities: [Modality.IMAGE, Modality.TEXT],
-        temperature: settings.creativity,
       },
     });
 

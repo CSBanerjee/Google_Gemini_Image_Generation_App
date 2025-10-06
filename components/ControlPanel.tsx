@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { AppSettings, AspectRatio, ProductImage, PromptMode } from '../types';
 import { ASPECT_RATIOS, DEFAULT_JSON_PROMPT } from '../constants';
-import { UploadIcon, WandIcon, LoadingSpinner, PaletteIcon } from './icons';
+import { UploadIcon, WandIcon, LoadingSpinner, PaletteIcon, SparklesIcon } from './icons';
 import { THEMES } from '../themes';
 
 interface ControlPanelProps {
@@ -12,6 +12,9 @@ interface ControlPanelProps {
     isLoading: boolean;
     productImage: ProductImage | null;
     isDescribing: boolean;
+    isRemovingBg: boolean;
+    isBgRemovalEnabled: boolean;
+    onBgRemovalToggle: (enabled: boolean) => void;
     theme: string;
     onThemeChange: (themeId: string) => void;
 }
@@ -36,6 +39,9 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
     isLoading,
     productImage,
     isDescribing,
+    isRemovingBg,
+    isBgRemovalEnabled,
+    onBgRemovalToggle,
     theme,
     onThemeChange
 }) => {
@@ -97,12 +103,25 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                         accept="image/jpeg, image/png, image/webp"
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                         onChange={handleFileChange}
-                        disabled={isDescribing}
+                        disabled={isDescribing || isRemovingBg}
                     />
                     {productImage && (
-                        <img src={productImage.objectURL} alt="Product Preview" className={`h-full w-full object-contain p-2 rounded-lg ${isDescribing ? 'opacity-30' : ''}`} />
+                        <div 
+                            className="absolute inset-0 p-2"
+                            style={productImage.file.type === 'image/png' ? {
+                                backgroundImage: `
+                                    linear-gradient(45deg, #ccc 25%, transparent 25%), 
+                                    linear-gradient(-45deg, #ccc 25%, transparent 25%),
+                                    linear-gradient(45deg, transparent 75%, #ccc 75%),
+                                    linear-gradient(-45deg, transparent 75%, #ccc 75%)`,
+                                backgroundSize: `20px 20px`,
+                                backgroundPosition: `0 0, 0 10px, 10px -10px, -10px 0px`
+                            } : {}}
+                        >
+                            <img src={productImage.objectURL} alt="Product Preview" className={`h-full w-full object-contain rounded-lg ${isDescribing || isRemovingBg ? 'opacity-30' : ''}`} />
+                        </div>
                     )}
-                    {!productImage && !isDescribing && (
+                    {!productImage && !isDescribing && !isRemovingBg && (
                         <>
                             <UploadIcon className="w-8 h-8 mb-2" />
                             <p className="text-sm text-center">Click or Drag & Drop</p>
@@ -115,7 +134,37 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                             <p className="text-sm mt-2 text-text-primary">Analyzing Image...</p>
                         </div>
                     )}
+                    {isRemovingBg && (
+                        <div className="absolute inset-0 flex flex-col justify-center items-center bg-surface bg-opacity-80">
+                            <LoadingSpinner className="w-8 h-8 text-brand-primary" />
+                            <p className="text-sm mt-2 text-text-primary">Removing Background...</p>
+                        </div>
+                    )}
                 </div>
+            </div>
+            
+            {/* Background Removal Toggle */}
+            <div className="flex items-center justify-between bg-bg p-3 rounded-lg border border-border">
+                <div className="flex items-center gap-2">
+                    <SparklesIcon className="w-5 h-5 text-brand-secondary"/>
+                    <label htmlFor="bg-removal-toggle" className="text-sm font-semibold text-text-primary cursor-pointer">
+                        Remove Background
+                    </label>
+                </div>
+                 <label htmlFor="bg-removal-toggle" className="flex items-center cursor-pointer">
+                    <div className="relative">
+                        <input 
+                            type="checkbox" 
+                            id="bg-removal-toggle" 
+                            className="sr-only" 
+                            checked={isBgRemovalEnabled} 
+                            onChange={(e) => onBgRemovalToggle(e.target.checked)}
+                            disabled={isDescribing || isRemovingBg}
+                        />
+                        <div className="block bg-border w-12 h-6 rounded-full"></div>
+                        <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${isBgRemovalEnabled ? 'transform translate-x-6 bg-brand-primary' : 'bg-surface'}`}></div>
+                    </div>
+                </label>
             </div>
 
             {/* 2. Output Ratio */}
@@ -194,11 +243,11 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             {/* 5. Generate Button */}
             <button
                 onClick={onGenerate}
-                disabled={isLoading || !productImage || isDescribing}
+                disabled={isLoading || !productImage || isDescribing || isRemovingBg}
                 className="w-full flex justify-center items-center gap-2 bg-brand-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-opacity-90 transition-all duration-200 disabled:bg-border disabled:text-text-secondary disabled:cursor-not-allowed transform hover:scale-105"
             >
                 <WandIcon className="w-5 h-5" />
-                <span>{isLoading ? 'Crafting Vision...' : isDescribing ? 'Analyzing...' : 'Generate Poster'}</span>
+                <span>{isLoading ? 'Crafting Vision...' : (isDescribing || isRemovingBg) ? 'Processing...' : 'Generate Poster'}</span>
             </button>
         </aside>
     );
